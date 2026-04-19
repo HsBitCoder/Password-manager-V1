@@ -35,5 +35,18 @@ separate branch using a rotating XOR cipher. This made me think about
 the real-world responsibility developers have when handling user data, 
 which connects directly to what I learned during CyberFirst Defenders.
 
+
+
+## Security
+Passwords are encrypted before storage using a rotating XOR cipher 
+with Base64 encoding, based on my [XOR Rotating Key]
+(https://github.com/HsBitCoder/XOR-Rotating-Key) project.
+
+A master key is required to encrypt and decrypt passwords. 
+Without the correct key, the stored data is unreadable.
+
+Note: XOR encryption is not cryptographically secure for 
+real-world use — this project demonstrates the practical 
+application of custom encryption to persistent data storage.
 ## Author
-HsBitCoder
+

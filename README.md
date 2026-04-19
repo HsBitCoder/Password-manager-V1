@@ -49,4 +49,4 @@ Note: XOR encryption is not cryptographically secure for
 real-world use — this project demonstrates the practical 
 application of custom encryption to persistent data storage.
 ## Author
-
+HsBitCoder

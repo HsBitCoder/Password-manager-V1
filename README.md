@@ -9,6 +9,7 @@ credentials locally using JSON file storage.
 - List all saved accounts
 - Persistent storage across sessions using JSON
 - Basic error handling and input validation
+<img width="1919" height="1034" alt="image" src="https://github.com/user-attachments/assets/7e89bca8-eaf4-400b-bf35-010a7029582f" />
 
 ## How It Works
 Passwords are stored locally in a `passwords.json` file. Each entry 

@@ -1,0 +1,154 @@
+import json
+import os
+import base64
+import hashlib
+
+FILE_NAME = "passwords.json"
+KEY_FILE = "master.hash"
+
+
+def hash_key(key):
+    return hashlib.sha256(key.encode()).hexdigest()
+
+
+def setup_master_key(key):
+    with open(KEY_FILE, "w") as f:
+        f.write(hash_key(key))
+    print("Master key set up successfully!")
+
+
+def verify_master_key(key):
+    if not os.path.exists(KEY_FILE):
+        return None  # First time running
+    with open(KEY_FILE, "r") as f:
+        stored_hash = f.read()
+    return hash_key(key) == stored_hash
+
+
+def xor_encrypt_decrypt(text, key):
+    result = ""
+    for i in range(len(text)):
+        key_char = key[i % len(key)]
+        result += chr(ord(text[i]) ^ ord(key_char))
+    return result
+
+
+def encrypt(text, key):
+    encrypted = xor_encrypt_decrypt(text, key)
+    encoded = base64.b64encode(encrypted.encode()).decode()
+    return encoded
+
+
+def decrypt(encoded, key):
+    encrypted = base64.b64decode(encoded).decode()
+    decrypted = xor_encrypt_decrypt(encrypted, key)
+    return decrypted
+
+
+def load_passwords():
+    if not os.path.exists(FILE_NAME):
+        return {}
+    with open(FILE_NAME, "r") as file:
+        return json.load(file)
+
+
+def save_passwords(passwords):
+    with open(FILE_NAME, "w") as file:
+        json.dump(passwords, file, indent=4)
+
+
+def add_password(master_key):
+    account = input("Enter account/service name: ")
+    username = input("Enter username: ")
+    password = input("Enter password: ")
+
+    passwords = load_passwords()
+
+    passwords[account] = {
+        "username": encrypt(username, master_key),
+        "password": encrypt(password, master_key)
+    }
+
+    save_passwords(passwords)
+    print("Password saved and encrypted!")
+
+
+def get_password(master_key):
+    account = input("Enter account/service name: ")
+    passwords = load_passwords()
+
+    if account in passwords:
+        try:
+            username = decrypt(passwords[account]['username'], master_key)
+            password = decrypt(passwords[account]['password'], master_key)
+            print(f"Username: {username}")
+            print(f"Password: {password}")
+        except Exception as e:
+            print("Error decrypting — wrong master key?")
+    else:
+        print("No account found.")
+
+
+def list_accounts():
+    passwords = load_passwords()
+
+    if not passwords:
+        print("No saved accounts.")
+        return
+
+    print("\nAccounts:")
+    for account in passwords:
+        print(f"- {account}")
+
+
+def main():
+    print("Password Manager (XOR Encrypted)")
+
+    if not os.path.exists(KEY_FILE):
+        # First time running — set up master key
+        print("No master key found. Setting up for first time.")
+        master_key = input("Create your master key: ")
+        confirm_key = input("Confirm your master key: ")
+
+        if master_key != confirm_key:
+            print("Keys don't match. Exiting.")
+            return
+
+        if not master_key:
+            print("Master key cannot be empty.")
+            return
+
+        setup_master_key(master_key)
+    else:
+        # Master key exists — verify it
+        master_key = input("Enter your master key: ")
+        result = verify_master_key(master_key)
+
+        if not result:
+            print("Incorrect master key. Access denied.")
+            return
+
+    while True:
+        print("\nPassword Manager (XOR Encrypted)")
+        print("1. Add Password")
+        print("2. Get Password")
+        print("3. List Accounts")
+        print("4. Exit")
+
+        choice = input("Choose (1-4): ")
+
+        if choice == "1":
+            add_password(master_key)
+        elif choice == "2":
+            get_password(master_key)
+        elif choice == "3":
+            list_accounts()
+        elif choice == "4":
+            print("Hope you enjoyed!")
+            break
+        else:
+            print("Invalid choice")
+
+
+if __name__ == "__main__":
+    main()

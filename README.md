@@ -21,6 +21,7 @@ automatically on first use if it doesn't exist.
 Passwords are currently stored in plain text. This project is intended 
 as a demonstration of file handling, data persistence, and CLI design 
 in Python — not for real-world secure storage.
+<img width="1917" height="907" alt="image" src="https://github.com/user-attachments/assets/aec3e65c-42d5-43bb-b919-19aff1af439b" />
 
 
 ## What I Learned

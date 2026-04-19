@@ -1,0 +1,83 @@
+import json
+import os
+
+FILE_NAME = "passwords.json"
+
+
+def load_passwords():
+    if not os.path.exists(FILE_NAME):
+        return {}
+    
+    with open(FILE_NAME, "r") as file:
+        return json.load(file)
+
+
+def save_passwords(passwords):
+    with open(FILE_NAME, "w") as file:
+        json.dump(passwords, file, indent=4)
+
+
+def add_password():
+    account = input("Enter account/service name: ")
+    username = input("Enter username: ")
+    password = input("Enter password: ")
+
+    passwords = load_passwords()  # call function to get dict
+
+    passwords[account] = {
+        "username": username,
+        "password": password
+    }
+
+    save_passwords(passwords)
+    print("Password saved!")
+
+
+def get_password():
+    account = input("Enter account/service name: ")
+    passwords = load_passwords()
+
+    if account in passwords:
+        print(f"Username: {passwords[account]['username']}")
+        print(f"Password: {passwords[account]['password']}")
+    else:
+        print("No account found.")
+
+
+def list_accounts():
+    passwords = load_passwords()
+
+    if not passwords:
+        print("No saved accounts.")
+        return
+
+    print("\nAccounts:")
+    for account in passwords:
+        print(f"- {account}")
+
+
+def main():
+    while True:
+        print("\nBasic Password Manager")
+        print("1. Add Password")
+        print("2. Get Password")
+        print("3. List Accounts")
+        print("4. Exit")
+
+        choice = input("Choose (1-4): ")
+
+        if choice == "1":
+            add_password()
+        elif choice == "2":
+            get_password()
+        elif choice == "3":
+            list_accounts()
+        elif choice == "4":
+            print("Hope you enjoyed!")
+            break
+        else:
+            print("Invalid choice")
+
+
+if __name__ == "__main__":
+    main()
